@@ -1,13 +1,9 @@
 <div id="widgets" class="row">
-	<div class="col-md-7" id="active-widgets">
-		<ul class="nav nav-pills">
-		<!-- BEGIN templates -->
-			<li class="<!-- IF @first -->active<!-- ENDIF @first -->"><a href="#" data-template="{../template}" data-toggle="pill">{../template}</a></li>
-		<!-- END templates -->
-		</ul>
+	<div class="col-md-8" id="active-widgets">
+		
 
 		<div class="row">
-			<div class="col-xs-12">
+			<div class="col-xs-9">
 				<div class="tab-content">
 				<!-- BEGIN templates -->
 					<div class="tab-pane <!-- IF @first -->active<!-- ENDIF @first -->" data-template="{../template}">
@@ -23,10 +19,22 @@
 				<!-- END templates -->
 				</div>
 			</div>
+			<div class="col-xs-3">
+				<div class="dropdown">
+					<a href="#" class="nav-link" data-toggle="dropdown">Custom pages<span class="caret"></span></a>
+					<ul class="dropdown-menu dropdown-custom-pages">
+						<!-- BEGIN templates -->
+							<li class="<!-- IF @first -->active<!-- ENDIF @first -->">
+								<a href="#" data-template="{../template}" data-toggle="pill">{../template}</a>
+							</li>
+						<!-- END templates --> 
+					</ul>
+				</div>
+			</div>
 		</div>
 	</div>
 
-	<div class="col-md-5">
+	<div class="col-md-4">
 		<div class="panel panel-default">
 			<div class="panel-heading">[[admin/extend/widgets:available]]</div>
 			<div class="panel-body">

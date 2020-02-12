@@ -92,7 +92,7 @@ function buildTemplatesFromAreas(areas) {
 			location: area.location,
 		});
 	});
-	return templates;
+	return templates.sort(function(a,b){return a.template > b.template;});
 }
 
 require('../promisify')(admin);

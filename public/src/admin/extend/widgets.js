@@ -17,6 +17,23 @@ define('admin/extend/widgets', ['jqueryui'], function () {
 			return false;
 		});
 
+		$('#widgets .dropdown-custom-pages a').on('click', function (ev) {
+			var $this = $(this);
+			$('#widgets .dropdown-custom-pages li').removeClass('active');
+			$this.parent().addClass('active');
+
+			$('#widgets .tab-pane').removeClass('active');
+			$('#widgets .tab-pane[data-template="' + $this.attr('data-template') + '"]').addClass('active');
+
+			ev.preventDefault();
+			return false;
+		});
+
+		$('#widgets .dropdown-custom-pages').on('click', function (ev) {
+			var $this = $(this);
+			$this.dropdown();
+		});
+
 		$('#widget-selector').on('change', function () {
 			$('.available-widgets [data-widget]').addClass('hide');
 			$('.available-widgets [data-widget="' + $(this).val() + '"]').removeClass('hide');
