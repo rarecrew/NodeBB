@@ -113,7 +113,7 @@ async function getFileData(currentDir, file) {
 		sizeHumanReadable: (stat.size / 1024).toFixed(1) + 'KiB',
 		isDirectory: stat.isDirectory(),
 		isFile: stat.isFile(),
-		isUploadFile: url.includes('uploads\\files') && stat.isFile(),
+		isUploadFile: url.includes('files/') && stat.isFile(),
 		mtime: stat.mtimeMs,
 	};
 }
