@@ -11,7 +11,7 @@ const util = require('util');
 
 const readdirAsync = util.promisify(fs.readdir);
 const copyFileAsync = util.promisify(fs.copyFile);
-const writeFleAsync = util.promisify(fs.writeFile);
+const writeFileAsync = util.promisify(fs.writeFile);
 const statAsync = util.promisify(fs.stat);
 const unlinkAsync = util.promisify(fs.unlink);
 const linkAsync = util.promisify(fs.link);
@@ -34,6 +34,10 @@ file.saveFileToLocal = async function (filename, folder, tempPath) {
 	winston.verbose('Saving file ' + filename + ' to : ' + uploadPath);
 	await mkdirp(path.dirname(uploadPath));
 	await copyFileAsync(tempPath, uploadPath);
+
+	const uploadPathRules = uploadPath.concat('.nbbrules');
+	await writeFileAsync(uploadPathRules, '');
+
 	return {
 		url: '/assets/uploads/' + (folder ? folder + '/' : '') + filename,
 		path: uploadPath,
@@ -44,7 +48,7 @@ file.base64ToLocal = async function (imageData, uploadPath) {
 	const buffer = Buffer.from(imageData.slice(imageData.indexOf('base64') + 7), 'base64');
 	uploadPath = path.join(nconf.get('upload_path'), uploadPath);
 
-	await writeFleAsync(uploadPath, buffer, {
+	await writeFileAsync(uploadPath, buffer, {
 		encoding: 'base64',
 	});
 	return uploadPath;

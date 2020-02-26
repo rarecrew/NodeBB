@@ -1,6 +1,10 @@
 'use strict';
 
 const validator = require('validator');
+const path = require('path');
+const nconf = require('nconf');
+const fs = require('fs');
+
 const groups = require('../groups');
 const meta = require('../meta');
 const user = require('../user');
@@ -9,7 +13,50 @@ const events = require('../events');
 const privileges = require('../privileges');
 const notifications = require('../notifications');
 
+
 const SocketGroups = module.exports;
+
+SocketGroups.getGroups = async () => {
+	const groupMap = await groups.getGroups('groups:createtime', 0, -1);
+	return await groupMap.filter(groupName => !groupName.includes(':privileges:'));
+};
+
+SocketGroups.getFileGroupRestrictions = async (socket, data) => {
+	if (typeof data.fileName !== 'string') {
+		throw new Error('[[error:invalid-data]]');
+	}
+	const finalPath = path.join(nconf.get('upload_path'), data.fileName.concat('.nbbrules'));
+
+	if (!fs.existsSync(finalPath)) {
+		fs.writeFileSync(finalPath, '');
+		return [];
+	}
+
+	const restrictions = fs.readFileSync(finalPath, 'utf8').split(';');
+	const table = [];
+	restrictions.forEach((element) => {
+		table.push({ groupName: element, access: 1 });
+	});
+	return table;
+};
+
+SocketGroups.setFileGroupRestrictions = async (socket, data) => {
+	if (typeof data.fileName !== 'string') {
+		throw new Error('[[error:invalid-data]]');
+	}
+	const finalPath = path.join(nconf.get('upload_path'), data.fileName.concat('.nbbrules'));
+
+	if (!fs.existsSync(finalPath)) {
+		fs.writeFileSync(finalPath, '');
+	}
+
+	let restrictionString = '';
+	data.fileRestrictions.forEach((element) => {
+		restrictionString += element.groupName;
+		restrictionString += ';';
+	});
+	fs.writeFileSync(finalPath, restrictionString);
+};
 
 SocketGroups.before = async (socket, method, data) => {
 	if (!data) {

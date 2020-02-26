@@ -5,5 +5,9 @@
     "orphaned": "Orphaned",
     "size/filecount": "Size / Filecount",
     "confirm-delete": "Do you really want to delete this file?",
-    "filecount": "%1 files"
+    "filecount": "%1 files",
+    "file-restrictions": "Select groups to access the file.",
+    "file-restrictions-info": "If no group is selected, all groups has access.",
+    "group-name": "Group",
+    "has-access": "Access"
 }

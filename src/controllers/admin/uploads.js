@@ -28,7 +28,7 @@ uploadsController.get = async function (req, res, next) {
 	const page = parseInt(req.query.page, 10) || 1;
 	try {
 		let files = await readdirAsync(currentFolder);
-		files = files.filter(filename => filename !== '.gitignore');
+		files = files.filter(filename => filename !== '.gitignore' && !filename.endsWith('.nbbrules'));
 		const itemCount = files.length;
 		var start = Math.max(0, (page - 1) * itemsPerPage);
 		var stop = start + itemsPerPage;
@@ -95,17 +95,25 @@ async function getFileData(currentDir, file) {
 	let filesInDir = [];
 	if (stat.isDirectory()) {
 		filesInDir = await readdirAsync(path.join(currentDir, file));
+		for (var i = filesInDir.length - 1; i > -1; i--) {
+			if (filesInDir[i] === '.gitignore') {
+				filesInDir.splice(i, 1);
+			} else if (filesInDir[i].endsWith('.nbbrules')) {
+				filesInDir.splice(i, 1);
+			}
+		}
 	}
 	const url = nconf.get('upload_url') + currentDir.replace(nconf.get('upload_path'), '') + '/' + file;
 	return {
 		name: file,
 		path: path.join(currentDir, file).replace(nconf.get('upload_path'), ''),
 		url: url,
-		fileCount: Math.max(0, filesInDir.length - 1), // ignore .gitignore
+		fileCount: Math.max(0, filesInDir.length),
 		size: stat.size,
 		sizeHumanReadable: (stat.size / 1024).toFixed(1) + 'KiB',
 		isDirectory: stat.isDirectory(),
 		isFile: stat.isFile(),
+		isUploadFile: url.includes('uploads\\files') && stat.isFile(),
 		mtime: stat.mtimeMs,
 	};
 }

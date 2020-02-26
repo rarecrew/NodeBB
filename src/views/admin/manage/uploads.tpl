@@ -9,6 +9,7 @@
 			<tr>
 				<th>[[admin/manage/uploads:filename]]</th>
 				<!-- IF showPids --><th class="text-right">[[admin/manage/uploads:usage]]</th><!-- END -->
+				<th></th>
 				<th class="text-right">[[admin/manage/uploads:size/filecount]]</th>
 				<th></th>
 			</tr>
@@ -38,6 +39,8 @@
 					<!-- END -->
 				</td>
 				<!-- END -->
+
+				<td role="button" class="col-md-1 text-right"><i class="restrict fa fa-fw fa-eye <!-- IF !files.isUploadFile --> hidden<!-- ENDIF !files.isUploadFile -->"></i></td>
 
 				<td class="col-md-2 text-right"><!-- IF files.isFile -->{files.sizeHumanReadable}<!-- ELSE -->[[admin/manage/uploads:filecount, {files.fileCount}]]<!-- ENDIF files.isFile --></td>
 

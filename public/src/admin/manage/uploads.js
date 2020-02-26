@@ -1,7 +1,7 @@
 'use strict';
 
 
-define('admin/manage/uploads', ['uploader'], function (uploader) {
+define('admin/manage/uploads', ['uploader', 'fileRestriction'], function (uploader, fileRestriction) {
 	var Uploads = {};
 
 	Uploads.init = function () {
@@ -27,6 +27,19 @@ define('admin/manage/uploads', ['uploader'], function (uploader) {
 					}
 					file.remove();
 				});
+			});
+		});
+
+		$('.restrict').on('click', function () {
+			var file = $(this).parents('[data-path]');
+			fileRestriction.show({
+				title: '[[admin/manage/uploads:file-restriction]]',
+				route: config.relative_path + '/api/admin/upload/restriction',
+				params: {
+					file: file[0].dataset.path,
+				},
+			}, function () {
+				ajaxify.refresh();
 			});
 		});
 	};

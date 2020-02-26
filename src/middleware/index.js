@@ -8,6 +8,7 @@ var nconf = require('nconf');
 var ensureLoggedIn = require('connect-ensure-login');
 var toobusy = require('toobusy-js');
 var LRU = require('lru-cache');
+var fs = require('fs');
 
 var plugins = require('../plugins');
 var meta = require('../meta');
@@ -153,19 +154,57 @@ function expose(exposedField, method, field, req, res, next) {
 }
 
 middleware.privateUploads = function privateUploads(req, res, next) {
-	if (req.loggedIn || !meta.config.privateUploads) {
+	// console.log(nconf.get('upload_path'))
+	// console.log(req.uid);
+	// console.log(req.path);
+
+	// //const restrictions = fs.readFileSync(req.path + '.nbbrules', 'utf8').split(';');
+	// console.log(restrictions);
+
+	// let groupsData = Promise.all([
+	// 	groups.getUserGroups([req.uid])
+	// ]);
+	// groupsData = groupsData[0];
+	// const groupNames = groupsData.filter(Boolean).map(group => group.name);
+
+	if (!meta.config.privateUploads) {
 		return next();
 	}
 
 	if (req.path.startsWith(nconf.get('relative_path') + '/assets/uploads/files')) {
+		if (!req.loggedIn) {
+			return res.status(403).json('not-allowed');
+		}
 		var extensions = (meta.config.privateUploadsExtensions || '').split(',').filter(Boolean);
 		var ext = path.extname(req.path);
 		ext = ext ? ext.replace(/^\./, '') : ext;
 		if (!extensions.length || extensions.includes(ext)) {
-			return res.status(403).json('not-allowed');
+			const fileName = req.path.toString().substring(req.path.toString().lastIndexOf('/files') + 1);
+			const restrictionFilePath = path.join(nconf.get('upload_path'), fileName.concat('.nbbrules'));
+			if (!fs.existsSync(restrictionFilePath)) {
+				return next();
+			}
+
+			const restrictionGroups = fs.readFileSync(restrictionFilePath, 'utf8').split(';');
+			if (restrictionGroups.length <= 1) {
+				return next();
+			}
+			const userGroups = [];
+			groups.getUserGroups([req.uid])
+				.then((response) => {
+					response[0].forEach((x) => {
+						userGroups.push(x.name);
+					});
+
+					if (restrictionGroups.some(element => userGroups.indexOf(element) !== -1)) {
+						return next();
+					}
+					return res.status(403).json('not-allowed-group');
+				});
 		}
+	} else {
+		next();
 	}
-	next();
 };
 
 middleware.busyCheck = function busyCheck(req, res, next) {
